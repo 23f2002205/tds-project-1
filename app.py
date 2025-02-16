@@ -137,7 +137,8 @@ def extract_recent_log_lines(input_path: str, output_path: str, num_recent_logs:
                     output_file.write(first_line + "\n")
 
 def extract_titles(input_path: str, output_path: str, heading_prefix: str):
-    """Finds all Markdown files and extracts the first H1 (#) title from each, creating an index."""
+    """Extracts the first H1 (#) title from Markdown files and creates an index."""
+
     base_dir = os.path.dirname(os.path.abspath(__file__))
     input_path = os.path.join(base_dir, input_path.lstrip("/"))  # Convert to relative if needed
     output_path = os.path.join(base_dir, output_path.lstrip("/"))
@@ -145,25 +146,23 @@ def extract_titles(input_path: str, output_path: str, heading_prefix: str):
     index = {}
     docs_path = Path(input_path)
 
-    if not docs_path.exists():
-        print(f"Error: Directory '{input_path}' does not exist.")
-        return
-
-    for md_file in docs_path.rglob("*.md"):  
+    for md_file in docs_path.rglob("*.md"):
         try:
-            with open(md_file, "r", encoding="utf-8") as file:
+            with md_file.open("r", encoding="utf-8") as file:
                 for line in file:
                     line = line.strip()
                     if line.startswith(f"{heading_prefix} "):  
-                        filename = str(md_file.relative_to(docs_path))
-                        title = line[2:].strip()  
+                        filename = str(md_file.relative_to(docs_path)).replace("\\", "/")
+                        title = line[len(heading_prefix) + 1:].strip()  
                         index[filename] = title
                         break  
         except Exception as e:
             print(f"Warning: Could not process {md_file}: {e}")
 
-    with open(output_path, "w", encoding="utf-8") as json_file:
+    with open(output_path,'w',encoding="utf-8") as json_file:
         json.dump(index, json_file, indent=4, ensure_ascii=False)
+
+    print(f"Index written to {output_path}")
 
 def extract_email_sender(input_path, output_path):
     base_dir = os.path.dirname(os.path.abspath(__file__))
