@@ -52,7 +52,7 @@ def run_python_script_with_argument(script_url: str, argument: str):
     
     try:
         result = subprocess.run(
-            ["uv", "run", script_url, argument, "--root", "./data"],  # Runs the script with the argument
+            ["uv", "run", script_url, argument, "--root", "/data"],  # Runs the script with the argument
             text=True,
             capture_output=True,
             check=True  # Raises CalledProcessError if the script fails
